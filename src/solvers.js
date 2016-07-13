@@ -16,7 +16,41 @@
 
 
 window.findNRooksSolution = function(n) {
-  var solution = undefined; //fixme
+  var emptyBoard = new Board({n: n});
+  var rooksRemaining = n;
+  var solution = undefined;
+  // A recursive function will add one piece to a row, test it for conflicts, and either scrap the board or do it again on the next row.
+
+  var addPiece = (board, r) => {
+    // For each column
+    for ( var c = 0; c < n; c ++ ) {
+      // console.log('n:', n, '\n', 'c:', c, '\n', 'r:', r);
+      // Add a piece
+      board.togglePiece(r,c);
+      rooksRemaining --;
+
+      // Test for conflicts
+      if ( !board.hasAnyRooksConflicts() ) {
+        // No conflicts:
+        if ( rooksRemaining === 0 && r < n ) {
+          //// BASE CASE //// If this is the last rook, submit solution ////
+          board.print();
+          console.log(board.rows()[0]); // Wtf is happening here? Look at difference between 38 and 39.
+          console.log(board.rows());
+          solution = board.rows(); 
+        } else {
+          // addPiece to the next row
+          addPiece(board, r + 1);
+        }
+      }
+      // Remove the piece
+      board.togglePiece(r,c);
+      rooksRemaining ++;
+    }
+  }
+
+  // Kick it off;
+  addPiece(emptyBoard, 0);
 
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   return solution;
