@@ -66,42 +66,42 @@ window.countNRooksSolutions = function(n) {
 
   // We don't need to check every column, because once a piece is placed on that column, it can never hold another. We can store the valid columns in an array, and only check those, removing the column when a piece is placed.
   // Every empty board will need its own array of eligible columns that should persist through every recursive step.
-  var eligibleCols = _.range(n);
-  console.log(eligibleCols);
+  var colsToCheck = _.range(n);
+
   // A recursive function will add one piece to a row, test it for conflicts, and either scrap the board or do it again on the next row.
 
-  var addPiece = (board, r) => {
+  var addPiece = (board, r, colsToCheck) => {
     // For each column
-    for ( var c = 0; c < n; c ++ ) {
+    for ( var c = 0; c < colsToCheck.length; c ++ ) {
       // console.log('n:', n, '\n', 'c:', c, '\n', 'r:', r);
       // Add a piece
-      board.togglePiece(r,c);
+      board.togglePiece(r,colsToCheck[c]);
       rooksRemaining --;
 
       // Test for conflicts
       // TODO: Modify hasColConflict to only look up
-      if ( !board.hasColConflictAtM(c, r) ) {
+      if ( !board.hasColConflictAtM(colsToCheck[c], r) ) {
         // No conflicts:
         if ( rooksRemaining === 0 && r < n ) {
           //// BASE CASE //// If this is the last rook, submit solution ////
-
-          // console.log(board.rows()[0]); // Wtf is happening here? Look at difference between 38 and 39.
-          // console.log(board.rows());
-          // Because of above weirdness, I'm going to modify 'print' to return a copy of the board
           solutionCount ++;
         } else {
+          // Remove the column from colsToCheck
+          var reducedCols = colsToCheck.slice(0);
+          reducedCols.splice(c,1);
+
           // addPiece to the next row
-          addPiece(board, r + 1);
+          addPiece(board, r + 1, reducedCols);
         }
       }
       // Remove the piece
-      board.togglePiece(r,c);
+      board.togglePiece(r,colsToCheck[c]);
       rooksRemaining ++;
     }
   }
 
   // Kick it off;
-  addPiece(emptyBoard, 0);
+  addPiece(emptyBoard, 0, colsToCheck);
 
   console.log('Single solutionCount for ' + n + ' rooks:', JSON.stringify(solutionCount));
   return solutionCount;
