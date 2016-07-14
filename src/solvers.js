@@ -30,7 +30,8 @@ window.findNRooksSolution = function(n) {
       rooksRemaining --;
 
       // Test for conflicts
-      if ( !board.hasAnyRooksConflicts() ) {
+      // TODO: Modify hasColConflict to only look up
+      if ( !board.hasColConflictAt(c) ) {
         // No conflicts:
         if ( rooksRemaining === 0 && r < n ) {
           //// BASE CASE //// If this is the last rook, submit solution ////
