@@ -21,38 +21,47 @@ window.findNRooksSolution = function(n) {
   var solution = undefined;
   // A recursive function will add one piece to a row, test it for conflicts, and either scrap the board or do it again on the next row.
 
-  var addPiece = (board, r) => {
+  // We don't need to check every column, because once a piece is placed on that column, it can never hold another. We can store the valid columns in an array, and only check those, removing the column when a piece is placed.
+  // Every empty board will need its own array of eligible columns that should persist through recursion.
+  var eligibleCols = _.range(n);
+
+  // A recursive function will add one piece to a row, test it for conflicts, and either scrap the board or do it again on the next row.
+
+  var addPiece = (board, r, eligibleCols) => {
     // For each column
-    for ( var c = 0; c < n; c ++ ) {
-      // console.log('n:', n, '\n', 'c:', c, '\n', 'r:', r);
+    for ( var c = 0; c < eligibleCols.length; c ++ ) {
+      // If we've passed the last row
+      if ( r === n ) {
+        console.log('You passed the last row!');
+        return;
+      }
+
       // Add a piece
-      board.togglePiece(r,c);
+      board.togglePiece(r,eligibleCols[c]);
       rooksRemaining --;
 
-      // Test for conflicts
-      // TODO: Modify hasColConflict to only look up
-      if ( !board.hasColConflictAt(c) ) {
-        // No conflicts:
-        if ( rooksRemaining === 0 && r < n ) {
-          //// BASE CASE //// If this is the last rook, submit solution ////
+      // Remove the column from eligibleCols
+      var reducedCols = eligibleCols.slice(0);
+      reducedCols.splice(c,1);
 
-          // console.log(board.rows()[0]); // Wtf is happening here? Look at difference between 38 and 39.
-          // console.log(board.rows());
-          // Because of above weirdness, I'm going to modify 'print' to return a copy of the board
-          return solution = board.print();
-        } else {
-          // addPiece to the next row
-          addPiece(board, r + 1);
-        }
+      if ( rooksRemaining === 0 ) {
+      //// BASE CASE ////
+        // If this is the last rook, submit solution
+        solution = board.print();
+        return;
+      } else {
+        // addPiece to the next row and stop adding rooks to this row
+        return addPiece(board, r + 1, reducedCols);
       }
+
       // Remove the piece
-      board.togglePiece(r,c);
+      board.togglePiece(r,eligibleCols[c]);
       rooksRemaining ++;
     }
   }
 
   // Kick it off;
-  addPiece(emptyBoard, 0);
+  addPiece(emptyBoard, 0, eligibleCols, rooksRemaining);
 
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   return solution;
@@ -80,7 +89,8 @@ window.countNRooksSolutions = function(n) {
 
       // If we've passed the last row
       if ( r === n ) {
-        break;
+        console.log ('You\'ve passed the last row!');
+        return;
       } else if ( rooksRemaining === 0 ) {
         //// BASE CASE //// If this is the last rook, submit solution ////
         solutionCount ++;
