@@ -60,9 +60,45 @@ window.findNRooksSolution = function(n) {
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  var solutionCount = undefined; //fixme
+  var emptyBoard = new Board({n: n});
+  var rooksRemaining = n;
+  var solutionCount = 0;
+  // A recursive function will add one piece to a row, test it for conflicts, and either scrap the board or do it again on the next row.
 
-  console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
+  var addPiece = (board, r) => {
+    // For each column
+    for ( var c = 0; c < n; c ++ ) {
+      // console.log('n:', n, '\n', 'c:', c, '\n', 'r:', r);
+      // Add a piece
+      board.togglePiece(r,c);
+      rooksRemaining --;
+
+      // Test for conflicts
+      // TODO: Modify hasColConflict to only look up
+      if ( !board.hasColConflictAtM(c, r) ) {
+        // No conflicts:
+        if ( rooksRemaining === 0 && r < n ) {
+          //// BASE CASE //// If this is the last rook, submit solution ////
+
+          // console.log(board.rows()[0]); // Wtf is happening here? Look at difference between 38 and 39.
+          // console.log(board.rows());
+          // Because of above weirdness, I'm going to modify 'print' to return a copy of the board
+          solutionCount ++;
+        } else {
+          // addPiece to the next row
+          addPiece(board, r + 1);
+        }
+      }
+      // Remove the piece
+      board.togglePiece(r,c);
+      rooksRemaining ++;
+    }
+  }
+
+  // Kick it off;
+  addPiece(emptyBoard, 0);
+
+  console.log('Single solutionCount for ' + n + ' rooks:', JSON.stringify(solutionCount));
   return solutionCount;
 };
 
