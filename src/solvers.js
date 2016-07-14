@@ -63,6 +63,11 @@ window.countNRooksSolutions = function(n) {
   var emptyBoard = new Board({n: n});
   var rooksRemaining = n;
   var solutionCount = 0;
+
+  // We don't need to check every column, because once a piece is placed on that column, it can never hold another. We can store the valid columns in an array, and only check those, removing the column when a piece is placed.
+  // Every empty board will need its own array of eligible columns that should persist through every recursive step.
+  var eligibleCols = _.range(n);
+  console.log(eligibleCols);
   // A recursive function will add one piece to a row, test it for conflicts, and either scrap the board or do it again on the next row.
 
   var addPiece = (board, r) => {
