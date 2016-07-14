@@ -34,10 +34,11 @@ window.findNRooksSolution = function(n) {
         // No conflicts:
         if ( rooksRemaining === 0 && r < n ) {
           //// BASE CASE //// If this is the last rook, submit solution ////
-          board.print();
-          console.log(board.rows()[0]); // Wtf is happening here? Look at difference between 38 and 39.
-          console.log(board.rows());
-          solution = board.rows(); 
+
+          // console.log(board.rows()[0]); // Wtf is happening here? Look at difference between 38 and 39.
+          // console.log(board.rows());
+          // Because of above weirdness, I'm going to modify 'print' to return a copy of the board
+          return solution = board.print();
         } else {
           // addPiece to the next row
           addPiece(board, r + 1);

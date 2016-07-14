@@ -216,10 +216,19 @@
 
     print: function() {
       var n = this.get('n');
+      // Make it pretty for the console
       console.log('Table n:', n);
       for ( var i = 0; i < n; i ++ ) {
         console.log(this.rows()[i]);
       }
+      // Return the solution
+      var solution = [];
+      for ( var i = 0; i < n; i ++ ) {
+        var row = this.get(i);
+        row = row.slice();
+        solution.push(row);
+      }
+      return solution;
     }
 
     /*--------------------  End of Helper Functions  ---------------------*/
