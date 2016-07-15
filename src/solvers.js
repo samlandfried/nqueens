@@ -16,7 +16,7 @@
 
 
 window.findNRooksSolution = function(n) {
-  var emptyBoard = new Board({n: n});
+  var emptyBoard = new Board({ n: n });
   var rooksRemaining = n;
   var solution = undefined;
   // A recursive function will add one piece to a row, test it for conflicts, and either scrap the board or do it again on the next row.
@@ -29,23 +29,23 @@ window.findNRooksSolution = function(n) {
 
   var addPiece = (board, r, eligibleCols) => {
     // For each column
-    for ( var c = 0; c < eligibleCols.length; c ++ ) {
+    for (var c = 0; c < eligibleCols.length; c++) {
       // If we've passed the last row
-      if ( r === n ) {
+      if (r === n) {
         console.log('You passed the last row!');
         return;
       }
 
       // Add a piece
-      board.togglePiece(r,eligibleCols[c]);
-      rooksRemaining --;
+      board.togglePiece(r, eligibleCols[c]);
+      rooksRemaining--;
 
       // Remove the column from eligibleCols
       var reducedCols = eligibleCols.slice(0);
-      reducedCols.splice(c,1);
+      reducedCols.splice(c, 1);
 
-      if ( rooksRemaining === 0 ) {
-      //// BASE CASE ////
+      if (rooksRemaining === 0) {
+        //// BASE CASE ////
         // If this is the last rook, submit solution
         solution = board.print();
         return;
@@ -55,8 +55,8 @@ window.findNRooksSolution = function(n) {
       }
 
       // Remove the piece
-      board.togglePiece(r,eligibleCols[c]);
-      rooksRemaining ++;
+      board.togglePiece(r, eligibleCols[c]);
+      rooksRemaining++;
     }
   }
 
@@ -69,7 +69,7 @@ window.findNRooksSolution = function(n) {
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  var emptyBoard = new Board({n: n});
+  var emptyBoard = new Board({ n: n });
   var rooksRemaining = n;
   var solutionCount = 0;
 
@@ -81,32 +81,32 @@ window.countNRooksSolutions = function(n) {
 
   var addPiece = (board, r, eligibleCols) => {
     // For each column
-    for ( var c = 0; c < eligibleCols.length; c ++ ) {
+    for (var c = 0; c < eligibleCols.length; c++) {
       // console.log('n:', n, '\n', 'c:', c, '\n', 'r:', r);
       // Add a piece
-      board.togglePiece(r,eligibleCols[c]);
-      rooksRemaining --;
+      board.togglePiece(r, eligibleCols[c]);
+      rooksRemaining--;
 
       // If we've passed the last row
-      if ( r === n ) {
-        console.log ('You\'ve passed the last row!');
+      if (r === n) {
+        console.log('You\'ve passed the last row!');
         return;
-      } else if ( rooksRemaining === 0 ) {
+      } else if (rooksRemaining === 0) {
         //// BASE CASE //// 
         // Increment solution
-        solutionCount ++;
+        solutionCount++;
       } else {
         // Remove the column from eligibleCols
         var reducedCols = eligibleCols.slice(0);
-        reducedCols.splice(c,1);
+        reducedCols.splice(c, 1);
 
         // addPiece to the next row
         addPiece(board, r + 1, reducedCols);
       }
 
       // Remove the piece
-      board.togglePiece(r,eligibleCols[c]);
-      rooksRemaining ++;
+      board.togglePiece(r, eligibleCols[c]);
+      rooksRemaining++;
     }
   }
 
@@ -123,33 +123,48 @@ window.findNQueensSolution = function(n) {
   // We want to do this with a recursive function that will add a piece to the row, check if there are conflicts, recurse if not, then remove the piece and try the next column position
 
   // We need an empty board and an array of the columns that are still in play. We also need to track how many queens have been placed.
-  var newBoard = new Board(n);
+  var newBoard = new Board({ n: n });
   var eligibleCols = _.range(n);
-  var queensRemaining = n;
+  var solution = undefined;
 
-  var addPiece = function(board, r, eligibleCols) {
-    // We will reduce the number of cols for every queen placed
-    var reducedCols = eligibleCols.slice(0);
 
-    for ( var c = 0; c < eligibleCols.length; c ++ ) {
-      // Add a piece to the board
+  var addPiece = function(board, r, eligibleCols, queensRemaining) {
+    // If r === n, we've reached the end of the board
+
+    for (var c = 0; c < eligibleCols.length; c++) {
+      // Add a piece to the board and decrement queensRemaining
+      board.togglePiece(r, eligibleCols[c]);
+      queensRemaining --;
 
       // Check for conflicts.
+      if (!board.hasAnyQueenConflictsOn(r, eligibleCols[c])) {
         // If no, check queensRemaining
+        if (queensRemaining === 0) {
           // If 0, return solution.
-          // If more than 0, recurse.
+          solution = board.print();
+          console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
+        } else {
+          // If more than 0, remove col and recurse.
+          var reducedCols = eligibleCols.slice(0);
+          reducedCols.splice(c, 1);
 
-      // Remove the piece
+          addPiece(board, r + 1, reducedCols, queensRemaining);            
+        }
+      }
+      // Remove the piece and increment queensRemaining
+      board.togglePiece(r, eligibleCols[c]);
+      queensRemaining++;
     }
-
   };
 
-  addPiece(newBoard, 0, eligibleCols);
-
-  var solution = undefined; //fixme
-
-  console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
-  return solution;
+  if ( n === 0 ) {
+    solution = newBoard.print();
+    return solution;
+  } else {
+    // debugger;
+    addPiece(newBoard, 0, eligibleCols, n);   
+    return solution;
+  }
 };
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
