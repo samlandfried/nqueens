@@ -142,7 +142,6 @@ window.findNQueensSolution = function(n) {
         if (queensRemaining === 0) {
           // If 0, return solution.
           solution = board.print();
-          console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
         } else {
           // If more than 0, remove col and recurse.
           var reducedCols = eligibleCols.slice(0);
@@ -158,13 +157,46 @@ window.findNQueensSolution = function(n) {
   };
 
   addPiece(newBoard, 0, eligibleCols, n);   
+  console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
   return solution;
 };
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
-  var solutionCount = undefined; //fixme
+  var newBoard = new Board({ n: n });
+  var eligibleCols = _.range(n);
+  // I guess an empty board for n=0 counts as a solution
+  var solutionCount = n === 0 ? 1 : 0;
 
+
+  var addPiece = function(board, r, eligibleCols, queensRemaining) {
+    // If r === n, we've reached the end of the board
+
+    for (var c = 0; c < eligibleCols.length; c++) {
+      // Add a piece to the board and decrement queensRemaining
+      board.togglePiece(r, eligibleCols[c]);
+      queensRemaining --;
+
+      // Check for conflicts.
+      if (!board.hasAnyQueenConflictsOn(r, eligibleCols[c])) {
+        // If no, check queensRemaining
+        if (queensRemaining === 0) {
+          solutionCount ++;
+        } else {
+          // If more than 0, remove col and recurse.
+          var reducedCols = eligibleCols.slice(0);
+          reducedCols.splice(c, 1);
+
+          addPiece(board, r + 1, reducedCols, queensRemaining);            
+        }
+      }
+      // Remove the piece and increment queensRemaining
+      board.togglePiece(r, eligibleCols[c]);
+      queensRemaining++;
+    }
+  };
+
+  addPiece(newBoard, 0, eligibleCols, n);   
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
 };
