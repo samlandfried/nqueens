@@ -125,7 +125,7 @@ window.findNQueensSolution = function(n) {
   // We need an empty board and an array of the columns that are still in play. We also need to track how many queens have been placed.
   var newBoard = new Board({ n: n });
   var eligibleCols = _.range(n);
-  var solution = undefined;
+  var solution = newBoard.print();
 
 
   var addPiece = function(board, r, eligibleCols, queensRemaining) {
@@ -157,14 +157,8 @@ window.findNQueensSolution = function(n) {
     }
   };
 
-  if ( n === 0 ) {
-    solution = newBoard.print();
-    return solution;
-  } else {
-    // debugger;
-    addPiece(newBoard, 0, eligibleCols, n);   
-    return solution;
-  }
+  addPiece(newBoard, 0, eligibleCols, n);   
+  return solution;
 };
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
